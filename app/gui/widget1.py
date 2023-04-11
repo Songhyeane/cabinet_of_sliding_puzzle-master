@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import *
-from PyQt5.QtWidgets import QApplication, QWidget,QMainWindow
+from PyQt5.QtWidgets import QApplication, QWidget,QMainWindow,QDialog
 from PyQt5.QtGui import QPainter, QColor,QPen
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QPropertyAnimation, QPoint
@@ -30,6 +30,7 @@ class MyApp(QMainWindow):
         self.positions = []
         self.local_event_loop = QEventLoop()
         self.timer = QTimer(self)
+        self.warning()
         self.initUI()
 
     def set_xy_num(self,x_num,y_num):
@@ -49,16 +50,26 @@ class MyApp(QMainWindow):
         interval = puzzle_y_size // (puzzle_y_num+1)
         return interval
 
+    def warning(self):
+        self.warning =QDialog()
+        warning = QLabel('It\'s impossible',  self.warning)
+        btnDialog = QPushButton("OK",  self.warning)
+        btnDialog.clicked.connect(self.dialog_close)
+        hbox = QHBoxLayout()
+        hbox.addStretch(1)
+        hbox.addWidget(warning)
+        hbox.addWidget(btnDialog)
+        hbox.addStretch(1)
+        self.warning.setLayout(hbox)
+        self.warning.setWindowTitle('Warning')
+        self.warning.setWindowModality(Qt.ApplicationModal)
+        self.warning.resize(200, 100)
 
-    # goal_shape_example = '6 7 8 0 3 5 4 2 1'
-    # def reshape_puzzle(self,goal_shape):
-    #     print(goal_shape)
-    #     orders = ros.get_order('6 7 8 3 4 5 0 1 2',goal_shape)
-    #     blank = [self.puzzle.puzzle_pieces[0],]
-    #
-    #     print(orders)
-    #     for order in orders:
-    #         # self.move(,,order[1])
+    def dialog_open(self):
+        self.warning.show()
+
+    def dialog_close(self):
+        self.warning.close()
 
 
     def initUI(self):
@@ -171,7 +182,7 @@ class MyApp(QMainWindow):
                                    range(len(self.puzzle_pieces))]
         reshape.clicked.connect(lambda: self.reshape_puzzle(input.text()))
 
-        putIn.clicked.connect(lambda: self.input2order(self.get_pres_shape()))
+        intialize.clicked.connect(lambda: self.initialize())
 
 
     def get_pres_shape(self):
@@ -223,17 +234,39 @@ class MyApp(QMainWindow):
 
     def reshape_puzzle(self, goal_shape):
         try:
-            orders = self.make_order(goal_shape)
+            if len(goal_shape)!=17:
+                print(1)
+                raise Exception
+            try:
+                orders = self.make_order(goal_shape)
+            except:
+                raise Exception
         except :
-            print('check order')
-        finally:
-            pass
-        print(orders)
-        for order in orders :
-            print(f'orders')
-            self.timer.singleShot(300, lambda: self.one_by_one(order))
             print(2)
-            self.local_event_loop.exec()
+            self.dialog_open()
+        else:
+            for order in orders:
+                print(f'orders')
+                self.timer.singleShot(300, lambda: self.one_by_one(order))
+                print(2)
+                self.local_event_loop.exec()
+
+    def initialize(self):
+        try:
+
+            try:
+                orders = self.make_order('0 1 2 3 4 5 6 7 8')
+            except:
+                raise Exception
+        except :
+            print(2)
+            self.dialog_open()
+        else:
+            for order in orders:
+                print(f'orders')
+                self.timer.singleShot(300, lambda: self.one_by_one(order))
+                print(2)
+                self.local_event_loop.exec()
 
 
     def one_by_one(self,i):

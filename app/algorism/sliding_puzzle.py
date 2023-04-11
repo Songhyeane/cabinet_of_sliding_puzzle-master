@@ -141,7 +141,7 @@ def main(argv,init_state,goal_state):
         opts, args = getopt.getopt(argv,"hn:",["mx=", "heur=", "astar", "bfs"])
     except getopt.GetoptError:
         #print('python sliding_puzzle.py -h <help> -n <matrix shape ex: n = 3 -> 3x3 matrix> --mx <maximum_nodes> --heur <heuristic> --astar (default algorithm) or --bfs')
-        sys.exit(2)
+        raise Exception
     for opt, arg in opts:
         if opt == '-h':
             #print('python sliding_puzzle.py -h <help> -n <matrix shape ex: n = 3 -> 3x3 matrix> --mx <maximum_nodes> --heur <heuristic> --astar (default algorithm) or --bfs')
@@ -174,7 +174,7 @@ def main(argv,init_state,goal_state):
                 pass
                 #print("Please re-enter the input again correctly")
         except Exception as ex:
-            pass
+            raise Exception
             #print(ex)
             
     init_state = np.array(init_state).reshape(n, n)
