@@ -1,28 +1,48 @@
 import serial
 import time
+import numpy as np
+import threading
+import time
 
-py_serial = serial.Serial(
 
-    # Window
-    port='COM7',
+#steps = [[1, 1, 3], [2, 4, 2], [3, 5, 3], [4, 2, 0], [5, 4, 1], [6, 5, 2], [7, 3, 1], [8, 1, 0], [9, 5, 3]]
 
-    # 보드 레이트 (통신 속도)
-    baudrate=9600,
-)
 
-while True:
 
-    commend = input('아두이노에게 내릴 명령:')
+def push_orders(steps):
+    exitTread = False
 
-    py_serial.write(commend.encode())
+    steps = np.array(steps)
+    string_rep = ''.join(''.join(map(str, step)) for step in steps)
+    # levels = steps[:,0]
+    # targets = steps[:,1]
+    # directions = steps[:,2]
+    #
+    # levels = ''.join(map(str, levels))
+    # targets = ''.join(map(str, targets))
+    # directions = ''.join(map(str, directions))
+    #
+    # print(f'{levels}:levels, {targets}:targets ,{directions}:directions')
 
-    time.sleep(0.1)
+    ser = serial.Serial('COM7', 9600)  # Replace 'COMX' with your Arduino's serial port
+    time.sleep(1)  # Allow time for the serial connection to establish
+    # orders = [levels,targets,directions]
 
-    if py_serial.readable():
-        # 들어온 값이 있으면 값을 한 줄 읽음 (BYTE 단위로 받은 상태)
-        # BYTE 단위로 받은 response 모습 : b'\xec\x97\x86\xec\x9d\x8c\r\n'
-        response = py_serial.readline()
 
-        # 디코딩 후, 출력 (가장 끝의 \n을 없애주기위해 슬라이싱 사용)
-        print(response[:len(response) - 1].decode())
+    while True:
 
+        # Send string to Arduino
+        ser.write(string_rep.encode())
+        # Read the string sent back from Arduino
+        received_string = ser.readline().decode().strip()
+
+        if received_string :
+            #print("Received String:", received_string)
+            break
+
+
+    ser.close()
+
+    return received_string
+
+#push_orders(steps)
