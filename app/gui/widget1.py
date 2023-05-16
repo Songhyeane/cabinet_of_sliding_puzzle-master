@@ -14,6 +14,7 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 from app import reshape_ordered_state as ros
 from app import algorism
+from app import alogorism1
 import threading
 
 #0 1 2 3 4 5 6 7 8
@@ -133,9 +134,9 @@ class MyApp(QMainWindow):
 
         self.block_positions = [ i  for i in range(len(self.puzzle_pieces))]
 
-        print(self.positions)
-        print(self.block_positions)
-        print(self.puzzle_pieces)
+        #print(self.positions)
+        #print(self.block_positions)
+        #print(self.puzzle_pieces)
 
         input = QLineEdit()
         putIn = QPushButton('put in')
@@ -181,6 +182,8 @@ class MyApp(QMainWindow):
         self.puzzle_pieces_anim = [QPropertyAnimation(self.puzzle_pieces[i], b"pos") for i in
                                    range(len(self.puzzle_pieces))]
         reshape.clicked.connect(lambda: self.reshape_puzzle(input.text()))
+
+        putOut.clicked.connect(lambda: self.put_out(input.text()))
 
         intialize.clicked.connect(lambda: self.initialize())
 
@@ -231,6 +234,13 @@ class MyApp(QMainWindow):
         print(orders)
         return orders
 
+    def make_order_1(self,goal_shape):
+        init_shape = self.input2order(self.get_pres_shape())
+        goal_shape = self.input2order(goal_shape)
+        print(f'init_shape:{init_shape} goal_shape:{goal_shape}')
+        orders = [ order[1] for order in ros.get_order_1(init_shape, goal_shape)]
+        print(orders)
+        return orders
 
     def reshape_puzzle(self, goal_shape):
         try:
@@ -260,6 +270,30 @@ class MyApp(QMainWindow):
                 raise Exception
         except :
             print(2)
+            self.dialog_open()
+        else:
+            for order in orders:
+                print(f'orders')
+                self.timer.singleShot(300, lambda: self.one_by_one(order))
+                print(2)
+                self.local_event_loop.exec()
+
+    def put_out(self, target_block):
+        print(1)
+        print(target_block)
+        goal_shape = target_block + ' 0 0 0 0 0 0 0 0'
+        print(goal_shape)
+        try:
+            if len(goal_shape)!=17:
+                print(1)
+                raise Exception
+            try:
+                orders = self.make_order_1(goal_shape)
+            except:
+                raise Exception
+        except :
+            print(2)
+            print(target_block)
             self.dialog_open()
         else:
             for order in orders:

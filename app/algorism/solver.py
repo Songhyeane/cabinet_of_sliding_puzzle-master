@@ -6,7 +6,6 @@ import numpy as np
 # from game_state import GameState
 from app.algorism.game_state import GameState
 
-
 class Solver():
     def __init__(self, init_state, goal_state, heuristic_func = "manhattan", max_iter = 2500):
         self.__init_state = init_state
