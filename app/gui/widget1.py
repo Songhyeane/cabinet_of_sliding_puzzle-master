@@ -1,6 +1,4 @@
 import sys
-import traceback
-
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication, QWidget,QMainWindow,QDialog
 from PyQt5.QtGui import QPainter, QColor,QPen
@@ -9,16 +7,14 @@ from PyQt5.QtCore import QPropertyAnimation, QPoint
 from PyQt5.QtCore import *
 import math
 import  numpy as np
-import app.serial_to_arduino as sta
+
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 from app import reshape_ordered_state as ros
 from app import algorism
-from app import alogorism1
 import threading
-sys.stdout.flush()
 
 #0 1 2 3 4 5 6 7 8
 
@@ -137,9 +133,9 @@ class MyApp(QMainWindow):
 
         self.block_positions = [ i  for i in range(len(self.puzzle_pieces))]
 
-        #print(self.positions)
-        #print(self.block_positions)
-        #print(self.puzzle_pieces)
+        print(self.positions)
+        print(self.block_positions)
+        print(self.puzzle_pieces)
 
         input = QLineEdit()
         putIn = QPushButton('put in')
@@ -186,17 +182,15 @@ class MyApp(QMainWindow):
                                    range(len(self.puzzle_pieces))]
         reshape.clicked.connect(lambda: self.reshape_puzzle(input.text()))
 
-        putOut.clicked.connect(lambda: self.put_out(input.text()))
-
         intialize.clicked.connect(lambda: self.initialize())
 
 
     def get_pres_shape(self):
         init_shape = ''
         pres_position = [ [puzzle_piece.pos().x(),puzzle_piece.pos().y()] for puzzle_piece in self.puzzle_pieces]
-        #print(pres_position)
+        print(pres_position)
         pres_shape = [pres_position.index(position) for position in self.positions]
-        #print(pres_shape)
+        print(pres_shape)
         j = 0
         for i in range(len(pres_shape)*2-1) :
             if i%2 == 0:
@@ -204,18 +198,18 @@ class MyApp(QMainWindow):
                 j +=1
             else:
                 init_shape += ' '
-        #print(init_shape)
+        print(init_shape)
         return init_shape
 
     def input2order(self,input):
         order = ''
         times = len(input)/self.x_num
         input=input.split(' ')
-        #print(input)
+        print(input)
         input = np.array(input)
         input=input.reshape(self.x_num,-1)
         input = np.flip(input,axis=0)
-        #print(input)
+        print(input)
         input = input.flatten()
         print(input)
         result =''
@@ -232,42 +226,29 @@ class MyApp(QMainWindow):
     def make_order(self,goal_shape):
         init_shape = self.input2order(self.get_pres_shape())
         goal_shape = self.input2order(goal_shape)
-        #print(f'init_shape:{init_shape} goal_shape:{goal_shape}')
-        result = ros.get_order_1(init_shape, goal_shape)
-        print(sta.push_orders(result))
-        print(result)
-        orders = [ order[1] for order in result  ]
-        #print(orders)
+        print(f'init_shape:{init_shape} goal_shape:{goal_shape}')
+        orders = [ order[1] for order in ros.get_order(init_shape, goal_shape)]
+        print(orders)
         return orders
 
-    def make_order_1(self,goal_shape):
-        init_shape = self.input2order(self.get_pres_shape())
-        goal_shape = self.input2order(goal_shape)
-        #print(f'init_shape:{init_shape} goal_shape:{goal_shape}')
-        result = ros.get_order_1(init_shape, goal_shape)
-        print(sta.push_orders(result))
-        print(result)
-        orders = [ order[1] for order in result]
-        #print(orders)
-        return orders
 
     def reshape_puzzle(self, goal_shape):
         try:
             if len(goal_shape)!=17:
-                #print(1)
+                print(1)
                 raise Exception
             try:
                 orders = self.make_order(goal_shape)
             except:
                 raise Exception
-        except Exception as ex:
-            print(traceback.format_exc())
+        except :
+            print(2)
             self.dialog_open()
         else:
             for order in orders:
-                #print(f'orders')
+                print(f'orders')
                 self.timer.singleShot(300, lambda: self.one_by_one(order))
-                #print(2)
+                print(2)
                 self.local_event_loop.exec()
 
     def initialize(self):
@@ -277,37 +258,14 @@ class MyApp(QMainWindow):
                 orders = self.make_order('0 1 2 3 4 5 6 7 8')
             except:
                 raise Exception
-        except Exception as ex:
-            print(traceback.format_exc())
+        except :
+            print(2)
             self.dialog_open()
         else:
             for order in orders:
-                #print(f'orders')
+                print(f'orders')
                 self.timer.singleShot(300, lambda: self.one_by_one(order))
-                #print(2)
-                self.local_event_loop.exec()
-
-    def put_out(self, target_block):
-        #print(1)
-        print(target_block)
-        goal_shape = target_block + ' 0 0 0 0 0 0 0 0'
-        print(goal_shape)
-        try:
-            if len(goal_shape)!=17:
-                #print(1)
-                raise Exception
-            try:
-                orders = self.make_order_1(goal_shape)
-            except:
-                raise Exception
-        except Exception as ex:
-            print(traceback.format_exc())
-            self.dialog_open()
-        else:
-            for order in orders:
-                #print(f'orders')
-                self.timer.singleShot(300, lambda: self.one_by_one(order))
-                #print(2)
+                print(2)
                 self.local_event_loop.exec()
 
 
