@@ -5,7 +5,7 @@ import threading
 import time
 
 
-#steps = [[1, 1, 3], [2, 4, 2], [3, 5, 3], [4, 2, 0], [5, 4, 1], [6, 5, 2], [7, 3, 1], [8, 1, 0], [9, 5, 3]]
+steps = [[1, 1, 3], [2, 4, 2], [3, 5, 3], [4, 2, 0], [5, 4, 1], [6, 5, 2], [7, 3, 1], [8, 1, 0], [9, 5, 3]]
 
 
 
@@ -14,19 +14,9 @@ def push_orders(steps):
 
     steps = np.array(steps)
     string_rep = ''.join(''.join(map(str, step)) for step in steps)
-    # levels = steps[:,0]
-    # targets = steps[:,1]
-    # directions = steps[:,2]
-    #
-    # levels = ''.join(map(str, levels))
-    # targets = ''.join(map(str, targets))
-    # directions = ''.join(map(str, directions))
-    #
-    # print(f'{levels}:levels, {targets}:targets ,{directions}:directions')
 
     ser = serial.Serial('COM7', 9600)  # Replace 'COMX' with your Arduino's serial port
     time.sleep(1)  # Allow time for the serial connection to establish
-    # orders = [levels,targets,directions]
 
 
     while True:

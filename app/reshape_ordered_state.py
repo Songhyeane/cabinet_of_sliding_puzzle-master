@@ -5,8 +5,6 @@ import sys
 def get_order(init_shape,order_shape):
     input=sys.argv[1:]
     order=sp.main(input,init_shape,order_shape)
-    #print()
-    #print(order)
     return order
 
 def get_order_1(init_shape,order_shape):
